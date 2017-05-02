@@ -30,14 +30,15 @@ exports.fetchItem = function(schema, id) {
     if(!id) return reject(createError(400, 'id required'));
 
     resolve(fs.readFileProm(`${__dirname}/../data/${schema}/${id}.json`)
-    .then(data => {
-      try {
-        return JSON.parse(data.toString()); 
-      } catch (err) {
-        return reject(createError(500, err.message));
-      }
-    })
-    .catch(err => Promise.reject(createError,(500, err.message))));
+    .then(data => data)
+    // .then(data => {
+    //   try {
+    //     return JSON.parse(data.toString());
+    //   } catch (err) {
+    //     return reject(createError(500, err.message));
+    //   }
+    // })
+    .catch(err => Promise.reject(createError(500, err.message))));
   });
 };
 

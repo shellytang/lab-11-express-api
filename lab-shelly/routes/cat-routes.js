@@ -6,42 +6,50 @@ const Cat = require('../model/cat');
 
 module.exports = function(router) {
 
-  router.get('/api/cat', function(req, res) {
+  router.get('/api/cat/:id', function(req, res) {
     debug('GET /api/cat');
     if(req.url.query.id) {
-      catController.fetchItem('cat', req.url.query.id)
-      .then(cat => {
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.write(JSON.stringify(cat));
-        res.end();
-      })
-      .catch(err => {
-        console.error(err);
-        res.writeHead(404, {'Content-Type': 'text/plain'});
-        res.write('not found');
-        res.end();
-      });
+      catController.fetchItem('cat', req.params.id)
+      // .then(cat => {
+      //   res.writeHead(200, {'Content-Type': 'application/json'});
+      //   res.write(JSON.stringify(cat));
+      //   res.end();
+      // })
+      .then(data => res.json(JSON.stringify(data.toString())))
+      .catch(err => res.send(err));
+      // .catch(err => {
+      //   console.error(err);
+      //   res.writeHead(404, {'Content-Type': 'text/plain'});
+      //   res.write('not found');
+      //   res.end();
+      // });
       return;
     }
-    res.writeHead(400, {'Content-Type': 'text/plain'});
-    res.write('bad request');
-    res.end();
+    // res.writeHead(400, {'Content-Type': 'text/plain'});
+    // res.write('bad request');
+    // res.end();
   });
 
   router.post('/api/cat', function(req, res) {
     debug('POST /api/cat');
-    try {
-      let cat = new Cat(req.body.name, req.body.mood);
-      catController.createItem('cat', cat);
-      res.writeHead(200, {'Content-Type': 'application/json'});
-      res.write(JSON.stringify(cat));
-      res.end();
-    } catch(err) {
-      console.error(err);
-      res.writeHead(400, {'Content-Type': 'text/plain'});
-      res.write('bad request');
-      res.end();
-    }
+    // try {
+    //   let cat = new Cat(req.body.name, req.body.mood);
+    //   catController.createItem('cat', cat);
+    //   res.writeHead(200, {'Content-Type': 'application/json'});
+    //   res.write(JSON.stringify(cat));
+    //   res.end();
+    // } catch(err) {
+    //   console.error(err);
+    //   res.writeHead(400, {'Content-Type': 'text/plain'});
+    //   res.write('bad request');
+    //   res.end();
+    // }
+    let cat = new Cat(req.body.name, req.body.mood);
+    catController.createItem('cat', cat)
+    .then(() => res.json(JSON.stringify(cat)))
+    // .then(() => res.json(cat))
+    .catch(err => res.send(err));
+
   });
 
   router.delete('/api/cat', function(req, res) {
