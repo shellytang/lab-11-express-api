@@ -13,14 +13,12 @@ module.exports = function(router) {
       return;
     }
   });
-
   router.post('/api/cat', function(req, res) {
     let cat = new Cat(req.body.name, req.body.mood);
     catController.createItem('cat', cat)
     .then(() => res.json(JSON.stringify(cat)))
     .catch(err => res.send(err));
   });
-
   router.delete('/api/cat/:id', function(req, res) {
     if(req.params.id) {
       catController.deleteItem('cat', req.params.id)
@@ -28,7 +26,6 @@ module.exports = function(router) {
       .catch(err => res.send(err));
     }
   });
-
   router.put('/api/cat/:id', function(req, res) {
     if(req.params.id) {
       console.log('req params: ', req.params);

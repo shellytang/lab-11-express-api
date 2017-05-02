@@ -15,7 +15,7 @@ exports.createItem = function(schema, item) {
 
   fs.writeFileProm(`${__dirname}/../data/${schema}/${item.id}.json`, jsonItem)
   .then(() => jsonItem)
-  .catch(err => Promise.reject(createError(500, err.message)));
+  .catch((err) => Promise.reject(createError(500, err.message)));
 
   return Promise.resolve();
 };
