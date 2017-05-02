@@ -2,13 +2,11 @@
 
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'), {suffix: 'Prom'});
-const debug = require('debug')('http:storage');
 const createError = require('http-errors');
 
 module.exports = exports = {};
 
 exports.createItem = function(schema, item) {
-  debug('#createItem');
 
   if(!schema) return Promise.reject(createError(400, 'schema required'));
   if(!item) return Promise.reject(createError(400, 'item required'));
@@ -23,14 +21,12 @@ exports.createItem = function(schema, item) {
 };
 
 exports.fetchItem = function(schema, id) {
-  debug('#fetchItem');
 
   return new Promise((resolve, reject) => {
     if(!schema) return reject(createError(400, 'schema required'));
     if(!id) return reject(createError(400, 'id required'));
 
     resolve(fs.readFileProm(`${__dirname}/../data/${schema}/${id}.json`)
-    // .then(data => data)
     .then(data => {
       try {
         return JSON.parse(data.toString());
@@ -41,39 +37,37 @@ exports.fetchItem = function(schema, id) {
     .catch(err => Promise.reject(createError(500, err.message))));
   });
 };
-//
-// exports.deleteItem = function(schema, id) {
-//   debug('#deleteItem');
-//   return new Promise((resolve, reject) => {
-//     if(!schema) return reject(createError(400, 'schema required'));
-//     if(!id) return reject(createError(400, 'id required'));
-//
-//     fs.unlinkProm(`${__dirname}/../data/${schema}/${id}.json`, function(err){
-//       if(err) return reject(createError(500,err.message));
-//       resolve();
-//     });
-//   });
-// };
-//
-// exports.updateItem = function(schema, id, name, mood) {
-//   debug('#putItem');
-//   return new Promise((resolve, reject) => {
-//     if(!schema) return reject(createError(400, 'schema required'));
-//     if(!id) return reject(createError(400, 'id required'));
-//
-//     fs.readFileProm(`${__dirname}/../data/${schema}/${id}.json`)
-//     .then(data => {
-//       let jsonItem = JSON.parse(data.toString());
-//       jsonItem.name = name;
-//       jsonItem.mood = mood;
-//
-//       jsonItem = JSON.stringify(jsonItem);
-//
-//       fs.writeFileProm(`${__dirname}/../data/${schema}/${id}.json`, jsonItem)
-//         .then(() => jsonItem)
-//         .catch(err => Promise.reject(createError(500, err.message)));
-//       resolve();
-//     })
-//     .catch(err => Promise.reject(createError(500, err.message)));
-//   });
-// };
+
+exports.deleteItem = function(schema, id) {
+  return new Promise((resolve, reject) => {
+    if(!schema) return reject(createError(400, 'schema required'));
+    if(!id) return reject(createError(400, 'id required'));
+
+    fs.unlinkProm(`${__dirname}/../data/${schema}/${id}.json`, function(err){
+      if(err) return reject(createError(500,err.message));
+      resolve();
+    });
+  });
+};
+
+exports.updateItem = function(schema, id, name, mood) {
+  return new Promise((resolve, reject) => {
+    if(!schema) return reject(createError(400, 'schema required'));
+    if(!id) return reject(createError(400, 'id required'));
+
+    fs.readFileProm(`${__dirname}/../data/${schema}/${id}.json`)
+    .then(data => {
+      let jsonItem = JSON.parse(data.toString());
+      jsonItem.name = name;
+      jsonItem.mood = mood;
+
+      jsonItem = JSON.stringify(jsonItem);
+
+      fs.writeFileProm(`${__dirname}/../data/${schema}/${id}.json`, jsonItem)
+        .then(() => jsonItem)
+        .catch(err => Promise.reject(createError(500, err.message)));
+      resolve();
+    })
+    .catch(err => Promise.reject(createError(500, err.message)));
+  });
+};
