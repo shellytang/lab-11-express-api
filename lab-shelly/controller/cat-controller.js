@@ -30,50 +30,50 @@ exports.fetchItem = function(schema, id) {
     if(!id) return reject(createError(400, 'id required'));
 
     resolve(fs.readFileProm(`${__dirname}/../data/${schema}/${id}.json`)
-    .then(data => data)
-    // .then(data => {
-    //   try {
-    //     return JSON.parse(data.toString());
-    //   } catch (err) {
-    //     return reject(createError(500, err.message));
-    //   }
-    // })
+    // .then(data => data)
+    .then(data => {
+      try {
+        return JSON.parse(data.toString());
+      } catch (err) {
+        return reject(createError(500, err.message));
+      }
+    })
     .catch(err => Promise.reject(createError(500, err.message))));
   });
 };
-
-exports.deleteItem = function(schema, id) {
-  debug('#deleteItem');
-  return new Promise((resolve, reject) => {
-    if(!schema) return reject(createError(400, 'schema required'));
-    if(!id) return reject(createError(400, 'id required'));
-
-    fs.unlinkProm(`${__dirname}/../data/${schema}/${id}.json`, function(err){
-      if(err) return reject(createError(500,err.message));
-      resolve();
-    });
-  });
-};
-
-exports.updateItem = function(schema, id, name, mood) {
-  debug('#putItem');
-  return new Promise((resolve, reject) => {
-    if(!schema) return reject(createError(400, 'schema required'));
-    if(!id) return reject(createError(400, 'id required'));
-
-    fs.readFileProm(`${__dirname}/../data/${schema}/${id}.json`)
-    .then(data => {
-      let jsonItem = JSON.parse(data.toString());
-      jsonItem.name = name;
-      jsonItem.mood = mood;
-
-      jsonItem = JSON.stringify(jsonItem);
-
-      fs.writeFileProm(`${__dirname}/../data/${schema}/${id}.json`, jsonItem)
-        .then(() => jsonItem)
-        .catch(err => Promise.reject(createError(500, err.message)));
-      resolve();
-    })
-    .catch(err => Promise.reject(createError(500, err.message)));
-  });
-};
+//
+// exports.deleteItem = function(schema, id) {
+//   debug('#deleteItem');
+//   return new Promise((resolve, reject) => {
+//     if(!schema) return reject(createError(400, 'schema required'));
+//     if(!id) return reject(createError(400, 'id required'));
+//
+//     fs.unlinkProm(`${__dirname}/../data/${schema}/${id}.json`, function(err){
+//       if(err) return reject(createError(500,err.message));
+//       resolve();
+//     });
+//   });
+// };
+//
+// exports.updateItem = function(schema, id, name, mood) {
+//   debug('#putItem');
+//   return new Promise((resolve, reject) => {
+//     if(!schema) return reject(createError(400, 'schema required'));
+//     if(!id) return reject(createError(400, 'id required'));
+//
+//     fs.readFileProm(`${__dirname}/../data/${schema}/${id}.json`)
+//     .then(data => {
+//       let jsonItem = JSON.parse(data.toString());
+//       jsonItem.name = name;
+//       jsonItem.mood = mood;
+//
+//       jsonItem = JSON.stringify(jsonItem);
+//
+//       fs.writeFileProm(`${__dirname}/../data/${schema}/${id}.json`, jsonItem)
+//         .then(() => jsonItem)
+//         .catch(err => Promise.reject(createError(500, err.message)));
+//       resolve();
+//     })
+//     .catch(err => Promise.reject(createError(500, err.message)));
+//   });
+// };
