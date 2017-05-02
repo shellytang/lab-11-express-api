@@ -1,29 +1,49 @@
-![cf](https://i.imgur.com/7v5ASc8.png) lab-09-single-resource-api (SIMPLE PERSISTENCE)
+![cf](https://i.imgur.com/7v5ASc8.png) lab 11 single resource express api
 ======
 
-# To Submit this Assignment
-  * fork this repository
-  * write all of your code in a directory named `lab-` + `<your name>` **e.g.** `lab-duncan`
-    * please write the code from lab-08 to this new directory (make a copy as a starting point)
-    * it's in your best interests to retype it as practice
-  * push to your repository
-  * submit a pull request to this repository
-  * submit a link to your PR in canvas
-  * write a question and observation on canvas
+# Description
+* Created a HTTP Server using `express`
+* Create a Object Constructor that creates a cat with 3 properties (name, mood, id)
+* Data is saved using the storage module with file system persistence
+* Used the `body-parser` express middleware to on `POST` and `PUT` routes
 
-# Resources
-Here are some npm modules that you may find useful for this project, it is not required for you to use them.  
-* [del](https://github.com/sindresorhus/del) - a npm module that makes deleting files easy
-* [mkdirp](https://github.com/substack/node-mkdirp) - like `mkdir -p` but Node.js
+# Installation
+* Clone this repo and navigate to the lab-shelly directory
+* Download the dependencies
+* Run nodemon server in terminal
+* Use server endpoints for requests
 
-# Directions
-* make these directories to organize your code
- * lib
- * test
- * model
- * route
- * data // to hold your resources
-* refactor the **storage** module to have file system persistence
+## Server Endpoints
 
-## Bonus
-* **2pts** - have the **storage** module check for the type sub-directory, and create it if it does not exist
+### `/api/cat`
+ * `POST` request
+   * Create a resource by specifying the name and mood.
+   ```
+   HTTP POST :3000/api/cat name="milo" mood="hungry"
+   ```
+### `/api/cat/id`
+
+ * `GET` request
+   * Get a resource by passing an id in the query string
+   ```
+   HTTP GET :3000/api/cat/12345
+   ```
+ * `DELETE` request
+   * Delete a resource by passing in an id in the query string. It should return 204 status with no content in the body
+   ```
+   HTTP DELETE :3000/api/cat/12345
+   ```
+ * `PUT` request
+   * Update a resource by passing in a valid id in the query string and specifying the new name and mood.
+   ```
+   HTTP PUT :3000/api/cat/12345 name="eva" mood="grumpy"
+
+## Tests
+* Tests were written to ensure that the endpoints respond as described for each condition below::
+ * `GET` - test 404, responds with 'not found' for valid request made with an id that was not found
+ * `GET` - test 400, responds with 'bad request' if no id was provided in the request
+ * `GET` - test 200, response body like `{<data>}` for a request made with a valid id
+ * `PUT` - test 400, responds with 'bad request' for if no `body provided` or `invalid body`
+ * `PUT` - test 200, response body like  `{<data>}` for a post request with a valid body
+ * `POST` - test 400, responds with 'bad request' for if no `body provided` or `invalid body`
+ * `POST` - test 200, response body like  `{<data>}` for a post request with a valid body

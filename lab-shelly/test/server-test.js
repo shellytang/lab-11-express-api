@@ -8,8 +8,17 @@ const expect = chai.expect;
 chai.use(http);
 
 describe('Server module', function () {
+  let app;
+  before(done => {
+    app = server.listen(8000);
+    done();
+  });
 
-// ++++++++ POST +++++++++
+  after(done => {
+    app.close();
+    done();
+  });
+
   describe('POST method', function() {
     describe('a properly formatted request', function() {
       it('should return a 200 response' , (done) => {
@@ -54,65 +63,95 @@ describe('Server module', function () {
     });
   });
 
-  // +++++++++++++++++++++GET ++++++++++++++++++++++++++++++
   describe('GET method', function() {
+    let resource;
+    before(done => {
+      chai.request(server)
+      .post('/api/cat')
+      .send({name: 'binky', mood: 'grumpy'})
+      .end((err, res) => {
+        resource = JSON.parse(res.body);
+        done();
+      });
+    });
 
+    after(done => {
+      chai.request(server)
+      .delete('api/cat')
+      .query({id: resource.id})
+      .end(() => {
+        console.error();
+        done();
+      });
+    });
     describe('/api/cat route', function() {
 
-      describe('an improperly formatted request', function() {
-        it('should return an error response 400 of "not found" if no id provided', (done) => {
+      describe('a request for an id that does not exist', function() {
+        it('should return an error response 404 of "not found"', (done) => {
           chai.request(server)
-          .get('/api/cat/foo')
+          .get(`/api/cat/${resource.id}/124`)
           .end((err, res) => {
-            expect(res).to.have.status(400);
+            expect(res).to.have.status(404);
             done();
           });
         });
       });
-      describe('a request for an id that was not found', function() {
-        it('should return an error response 400 of "not found"', (done) => {
-          chai.request(server)
-          .get('/api/cat')
-          .end((err, res) => {
-            expect(res).to.have.status(400);
-            done();
-          });
-        });
-      });
-
-      describe('a property formatted request', function() {
+      describe('a properly formatted request with valid id', function() {
         it('should return a 200 response', done => {
           chai.request(server)
-          .get(`/api/cat/02afc632-2952-4ea7-b384-bf3d75d0e935`)
+          .get(`/api/cat/${resource.id}`)
           .end((err, res) => {
             expect(res).to.have.status(200);
             done();
           });
         });
-
-        describe('unregistered route', function() {
-          it('should respond with 404 for an id not found', () => {
-            chai.request(server)
-            .get('/api/dog')
-            .end((err, res) => {
-              expect(res).to.have.status(404);
-            });
+        it('should return a response body object', done => {
+          chai.request(server)
+          .get(`/api/cat/${resource.id}`)
+          .end((err, res) => {
+            expect(res).to.be.an('object');
+            done();
           });
         });
-
+      });
+      describe('unregistered route', function() {
+        it('should respond with 404 for an id not found', done => {
+          chai.request(server)
+          .get('/api/dog')
+          .end((err, res) => {
+            expect(res).to.have.status(404);
+            done();
+          });
+        });
       });
     });
   });
-
-  // ++++++++++++++ PUT +++++++++++++++++++++++++++
   describe('PUT method', function() {
+    let resource;
+    before(done => {
+      chai.request(server)
+      .post('/api/cat')
+      .send({name: 'eva', mood: 'grumpy'})
+      .end((err, res) => {
+        resource = JSON.parse(res.body);
+        done();
+      });
+    });
+    after(done => {
+      chai.request(server)
+      .delete('/api/cat')
+      .query({id: resource.id})
+      .end(() => {
+        console.error();
+        done();
+      });
+    });
+
     describe('/api/cat route', function() {
-
       describe('a properly formatted request', function() {
-
         it('should return a 200 response', done => {
           chai.request(server)
-          .put('/api/cat/02afc632-2952-4ea7-b384-bf3d75d0e935')
+          .put(`/api/cat/${resource.id}`)
           .send({name: 'mia', mood: 'happy'})
           .end((err, res) => {
             expect(res).to.have.status(200);
@@ -121,64 +160,37 @@ describe('Server module', function () {
         });
         it('should return a response body object', done => {
           chai.request(server)
-          .put('/api/cat/02afc632-2952-4ea7-b384-bf3d75d0e935')
+          .put(`/api/cat/${resource.id}`)
           .send({name: 'mia', mood: 'happy'})
           .end((err, res) => {
             expect(res).to.be.an('object');
             done();
           });
         });
-        describe('unregistered route', function() {
-          it('should return a 404 for unregistered route', done => {
-            chai.request(server)
-            .put('/api/dog')
-            .send({name: 'mia', mood: 'happy'})
-            .end((err, res) => {
-              expect(res).to.have.status(404);
-              done();
-            });
+      });
+
+      describe('an improperly formatted request', function() {
+        it('should return an error response 400 of "not found"', done => {
+          chai.request(server)
+          .get(`/api/cat/${resource.id}`)
+          .end((err, res) => {
+            expect(res).to.have.status(400);
+            done();
+          });
+        });
+      });
+
+      describe('unregistered route', function() {
+        it('should return a 404 for unregistered route', done => {
+          chai.request(server)
+          .put('/api/dog')
+          .send({name: 'mia', mood: 'happy'})
+          .end((err, res) => {
+            expect(res).to.have.status(404);
+            done();
           });
         });
       });
     });
   });
-  //
-  // ++++++++++++++++++++++++ DELETE ++++++++++++++++++++++++
-  // describe('DELETE method', function() {
-  //
-  //   describe('/api/cat route', function() {
-  //
-  //     describe('a response with a valid id', function() {
-  //       it('should return a 204 response', done => {
-  //         chai.request(server)
-  //         .delete('/api/cat/1e2ad6d4-71a1-44b9-ba7a-40775aa8b656')
-  //         .end((err, res) => {
-  //           expect(res).to.have.status(204);
-  //           done();
-  //         });
-  //       });
-  //     });
-  //     describe('a response for a valid request made with an id that was not found', function() {
-  //       it('should return a 404 response', done => {
-  //         chai.request(server)
-  //         .delete('/api/cat/1e2ad6d4-71a1-44b9-ba7a-407')
-  //         .end((err, res) => {
-  //           expect(res).to.have.status(404);
-  //           done();
-  //         });
-  //       });
-  //     });
-  //     describe('an unregistered request', function() {
-  //       it('should return a 404 request', done => {
-  //         chai.request(server)
-  //         .delete('/api/dog')
-  //         .end((err, res) => {
-  //           expect(res).to.have.status(404);
-  //           done();
-  //         });
-  //       });
-  //     });
-  //   });
-  // });
-
 });
