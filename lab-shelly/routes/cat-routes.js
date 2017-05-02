@@ -1,7 +1,7 @@
 'use strict';
 
 const debug = require('debug')('http:cat-routes');
-const storage = require('../lib/storage');
+const catController = require('../controller/cat-controller');
 const Cat = require('../model/cat');
 
 module.exports = function(router) {
@@ -9,7 +9,7 @@ module.exports = function(router) {
   router.get('/api/cat', function(req, res) {
     debug('GET /api/cat');
     if(req.url.query.id) {
-      storage.fetchItem('cat', req.url.query.id)
+      catController.fetchItem('cat', req.url.query.id)
       .then(cat => {
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.write(JSON.stringify(cat));
@@ -32,7 +32,7 @@ module.exports = function(router) {
     debug('POST /api/cat');
     try {
       let cat = new Cat(req.body.name, req.body.mood);
-      storage.createItem('cat', cat);
+      catController.createItem('cat', cat);
       res.writeHead(200, {'Content-Type': 'application/json'});
       res.write(JSON.stringify(cat));
       res.end();
@@ -47,7 +47,7 @@ module.exports = function(router) {
   router.delete('/api/cat', function(req, res) {
     debug('DELETE /api/cat');
     if(req.url.query.id) {
-      storage.deleteItem('cat', req.url.query.id)
+      catController.deleteItem('cat', req.url.query.id)
       .then(() => {
         res.writeHead(204, {'Content-Type': 'application/json'});
         res.write('delete successful'); //204 - no content
@@ -69,7 +69,7 @@ module.exports = function(router) {
   router.put('/api/cat', function(req, res) {
     debug('PUT /api/cat');
     if(req.url.query.id) {
-      storage.updateItem('cat', req.url.query.id, req.body.name, req.body.mood)
+      catController.updateItem('cat', req.url.query.id, req.body.name, req.body.mood)
       .then(() => {
         res.writeHead(202, {'Content-Type': 'application/json'});
         res.write('update sucessful'); //202 - Accepted request
