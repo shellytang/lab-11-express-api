@@ -29,7 +29,6 @@ exports.fetchItem = function(schema, id) {
     try {
       return JSON.parse(data.toString());
     } catch (err) {
-      console.log('whats the error: ', err);
       return createError(404, err.message);
     }
   })
@@ -58,6 +57,7 @@ exports.updateItem = function(schema, id, name, mood) {
 
   return fs.readFileProm(`${__dirname}/../data/${schema}/${id}.json`)
   .then(data => {
+
     let jsonItem = JSON.parse(data.toString());
     jsonItem.name = name;
     jsonItem.mood = mood;

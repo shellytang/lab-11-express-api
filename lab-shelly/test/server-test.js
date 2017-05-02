@@ -172,7 +172,8 @@ describe('Server module', function () {
       describe('an improperly formatted request', function() {
         it('should return an error response 400 of "not found"', done => {
           chai.request(server)
-          .get(`/api/cat/${resource.id}`)
+          .put(`/api/cat/${resource.id}`)
+          .send({})
           .end((err, res) => {
             expect(res).to.have.status(400);
             done();

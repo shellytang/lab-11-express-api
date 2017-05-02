@@ -39,9 +39,9 @@ module.exports = function(router) {
     if(req.params.id) {
       catController.updateItem('cat', req.params.id, req.body.name, req.body.mood)
       .then(() => res.send('update sucessful'))
-        .catch(err => {
-          return res.status(400).json(err);
-        });
+      .catch(err => {
+        return res.status(400).json(err);
+      });
     }
   });
 };
