@@ -14,11 +14,9 @@ exports.createItem = function(schema, item) {
 
   let jsonItem = JSON.stringify(item);
 
-  fs.writeFileProm(`${__dirname}/../data/${schema}/${item.id}.json`, jsonItem)
+  return fs.writeFileProm(`${__dirname}/../data/${schema}/${item.id}.json`, jsonItem)
   .then(() => jsonItem)
   .catch((err) => Promise.reject(createError(500, err.message)));
-
-  return Promise.resolve();
 };
 
 exports.fetchItem = function(schema, id) {
@@ -46,10 +44,9 @@ exports.deleteItem = function(schema, id) {
   if(!schema) return Promise.reject(createError(400, 'schema required'));
   if(!id) return createError(400, 'id required');
 
-  fs.unlinkProm(`${__dirname}/../data/${schema}/${id}.json`, function(err){
-    if(err) return createError(500,err.message);
-    return Promise.resolve();
-  });
+  return fs.unlinkProm(`${__dirname}/../data/${schema}/${id}.json`)
+  .then(() => {})
+  .catch(err => Promise.reject(createError(404, err.message)));
 };
 
 exports.updateItem = function(schema, id, name, mood) {
