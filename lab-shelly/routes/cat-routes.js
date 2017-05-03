@@ -30,7 +30,7 @@ module.exports = function(router) {
     debug('DELETE /api/cat');
     if(req.params.id) {
       catController.deleteItem('cat', req.params.id)
-      .then(() => res.send('delete successful'))
+      .then(() => res.sendStatus(204))
       .catch(err => res.send(err));
     }
   });

@@ -194,4 +194,64 @@ describe('Server module', function () {
       });
     });
   });
+
+  describe('DELETE method', function() {
+    let resource;
+    before(done => {
+      chai.request(server)
+      .post('/api/cat')
+      .send({name: 'eva', mood: 'grumpy'})
+      .end((err, res) => {
+        resource = JSON.parse(res.text);
+        done();
+      });
+    });
+
+    after(done => {
+      chai.request(server)
+      .delete('/api/cat')
+      .query({id: resource.id})
+      .end(() => {
+        console.error();
+        done();
+      });
+    });
+
+    describe('/api/cat route', function() {
+
+      describe('a response with a valid id', function() {
+        it('should return a 204 response', done => {
+          resource = JSON.parse(resource);
+          chai.request(server)
+          .delete(`/api/cat/${resource.id}`)
+          .end((err, res) => {
+            expect(res).to.have.status(204);
+            done();
+          });
+        });
+      });
+      describe('an unregistered request', function() {
+        it('should return a 404 request', done => {
+          chai.request(server)
+          .delete('/api/dog')
+          .query({id: resource.id})
+          .end((err, res) => {
+            expect(res).to.have.status(404);
+            done();
+          });
+        });
+      });
+      describe('a request with an improper id', function() {
+        it('should return a 404 response', done => {
+          chai.request(server)
+          .delete('/api/cat')
+          .query({id: '123455'})
+          .end((err, res) => {
+            expect(res).to.have.status(404);
+            done();
+          });
+        });
+      });
+    });
+  });
 });
